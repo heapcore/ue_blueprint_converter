@@ -1,0 +1,120 @@
+version: 1
+blueprints:
+- name: BP_MagicDoor
+  parent: /Script/Engine.Actor
+  description: Procedurally generated door with lock
+  variables:
+  - name: IsOpen
+    type: bool
+    default: false
+    editable: true
+    category: Door State
+    tooltip: Whether the door is currently open
+  - name: OpenAngle
+    type: float
+    default: 120.0
+    editable: true
+    category: Door Settings
+    tooltip: Angle to open the door (degrees)
+  - name: IsLocked
+    type: bool
+    default: true
+    editable: true
+    category: Door State
+    tooltip: Whether the door is locked
+  components:
+  - name: RootComponent
+    type: SceneComponent
+    transform:
+      location:
+      - 0
+      - 0
+      - 0
+      rotation:
+      - 0
+      - 0
+      - 0
+      scale:
+      - 1
+      - 1
+      - 1
+  - name: DoorFrame
+    type: StaticMeshComponent
+    parent: RootComponent
+    properties:
+      StaticMesh: /Game/Meshes/SM_DoorFrame
+      Material: /Game/Materials/M_Wood
+  - name: DoorPanel
+    type: StaticMeshComponent
+    parent: RootComponent
+    transform:
+      location:
+      - 0
+      - 0
+      - 0
+    properties:
+      StaticMesh: /Game/Meshes/SM_DoorPanel
+      Material: /Game/Materials/M_Wood
+  - name: CollisionBox
+    type: BoxComponent
+    parent: RootComponent
+    transform:
+      location:
+      - 0
+      - 0
+      - 100
+      scale:
+      - 2
+      - 0.5
+      - 2
+  - name: LockMechanism
+    type: StaticMeshComponent
+    parent: DoorPanel
+    transform:
+      location:
+      - 70
+      - 0
+      - 0
+    properties:
+      StaticMesh: /Game/Meshes/SM_Lock
+  functions:
+  - name: OpenDoor
+    category: Door Actions
+    access: public
+    pure: false
+    inputs:
+    - name: Speed
+      type: float
+      default: 1.0
+    - name: Force
+      type: bool
+      default: false
+    outputs:
+    - name: Success
+      type: bool
+    description: Opens the door with specified speed
+  - name: CloseDoor
+    category: Door Actions
+    access: public
+    inputs:
+    - name: Speed
+      type: float
+      default: 1.0
+    outputs:
+    - name: Success
+      type: bool
+  - name: ToggleLock
+    category: Door Actions
+    access: public
+    inputs:
+    - name: Key
+      type: object
+      object_class: /Game/Items/BP_Key
+    outputs:
+    - name: Success
+      type: bool
+  events:
+  - name: BeginPlay
+    description: Initialize door on level start
+  - name: OnActorBeginOverlap
+    description: Handle player interaction

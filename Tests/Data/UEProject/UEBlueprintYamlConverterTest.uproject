@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.6",
+	"Category": "",
+	"Description": "Test project for UE Blueprint YAML Converter plugin",
+
+	"Plugins": [
+		{
+			"Name": "UEBlueprintYamlConverter",
+			"Enabled": true
+		}
+	],
+	"TargetPlatforms": [
+		"Windows"
+	]
+}

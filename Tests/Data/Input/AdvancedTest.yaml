@@ -1,0 +1,142 @@
+version: 1
+blueprints:
+  - name: "BP_AdvancedDoor"
+    parent: "/Script/Engine.Actor"
+    description: "Advanced door with functions, components and events"
+
+    variables:
+      - name: "IsOpen"
+        type: "bool"
+        default: false
+        editable: true
+        category: "Door State"
+        tooltip: "Whether the door is currently open"
+
+      - name: "OpenAngle"
+        type: "float"
+        default: 90.0
+        editable: true
+        category: "Door Settings"
+
+      - name: "DoorMesh"
+        type: "object"
+        object_class: "/Script/Engine.StaticMeshComponent"
+
+    components:
+      - name: "RootComponent"
+        type: "SceneComponent"
+        transform:
+          location: [0, 0, 0]
+          rotation: [0, 0, 0]
+          scale: [1, 1, 1]
+
+      - name: "DoorMeshComp"
+        type: "StaticMeshComponent"
+        parent: "RootComponent"
+        properties:
+          StaticMesh: "/Game/Meshes/SM_Door"
+          Material: "/Game/Materials/M_Door"
+
+      - name: "CollisionBox"
+        type: "BoxComponent"
+        parent: "RootComponent"
+        transform:
+          location: [0, 0, 100]
+          scale: [2, 0.5, 2]
+
+    functions:
+      - name: "OpenDoor"
+        category: "Door Actions"
+        access: "public"
+        pure: false
+        inputs:
+          - name: "Speed"
+            type: "float"
+            default: 1.0
+        outputs:
+          - name: "Success"
+            type: "bool"
+        nodes:
+          - id: "entry"
+            type: "FunctionEntry"
+            position: [0, 0]
+
+          - id: "branch_check"
+            type: "Branch"
+            position: [200, 0]
+            pins:
+              Condition:
+                connection:
+                  node: "is_open_check"
+                  pin: "ReturnValue"
+            exec:
+              in:
+                node: "entry"
+                pin: "exec"
+              out:
+                - node: "set_is_open"
+                  pin: "exec"
+
+          - id: "is_open_check"
+            type: "GetVariable"
+            position: [200, 100]
+            variable: "IsOpen"
+
+          - id: "set_is_open"
+            type: "SetVariable"
+            position: [400, 0]
+            variable: "IsOpen"
+            pins:
+              Value:
+                value: true
+            exec:
+              out:
+                - node: "return"
+                  pin: "exec"
+
+          - id: "return"
+            type: "FunctionReturn"
+            position: [600, 0]
+            pins:
+              Success:
+                value: true
+
+      - name: "CloseDoor"
+        category: "Door Actions"
+        access: "public"
+        inputs: []
+        outputs: []
+
+    events:
+      - name: "BeginPlay"
+        nodes:
+          - id: "begin_play"
+            type: "Event_BeginPlay"
+            position: [0, 0]
+            exec:
+              out:
+                - node: "init_door"
+                  pin: "exec"
+
+          - id: "init_door"
+            type: "CallFunction"
+            position: [200, 0]
+            function: "InitializeDoor"
+
+      - name: "OnActorBeginOverlap"
+        nodes:
+          - id: "overlap_event"
+            type: "Event_ActorBeginOverlap"
+            position: [0, 0]
+            exec:
+              out:
+                - node: "open_door_call"
+                  pin: "exec"
+
+          - id: "open_door_call"
+            type: "CallFunction"
+            position: [300, 0]
+            function: "OpenDoor"
+            pins:
+              Speed:
+                value: 2.0

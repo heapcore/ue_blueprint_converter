@@ -1,0 +1,19 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1.0",
+  "FriendlyName": "UE Blueprint YAML Converter",
+  "Description": "Convert Unreal Engine Blueprints to/from YAML format",
+  "Category": "Editor",
+  "CreatedBy": "UE YAML",
+  "CreatedByURL": "https://example.local",
+  "CanContainContent": false,
+  "EnabledByDefault": true,
+  "Modules": [
+    {
+      "Name": "UEBlueprintYamlConverter",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ]
+}

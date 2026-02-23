@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "generatedAssets": [
+    {
+      "path": "/Game/Maps/L_Example",
+      "type": "World"
+    },
+    {
+      "path": "/Game/Generated/BP_TestRoundTrip",
+      "type": "Blueprint"
+    }
+  ]
+}

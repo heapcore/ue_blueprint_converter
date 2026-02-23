@@ -1,0 +1,99 @@
+# Unreal Engine build files
+Intermediate/
+Binaries/
+DerivedDataCache/
+
+# Unreal Engine generated files
+*.generated.h
+*.generated.cpp
+*.uhtmanifest
+*.uhtpath
+*.deps
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.sdf
+*.opensdf
+*.tmp
+*.log
+*.cache
+*.ipch
+*.sln
+*.sln.docstates
+*.userprefs
+*.sln.ide/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+
+# Pytest cache
+.pytest_cache/
+
+# Unreal Editor saved files
+Logs/
+Crashes/
+AutoScreenshot.png
+Autosaves/
+ShaderDebugInfo/
+UnrealBuildTool/
+CrashReportClient/
+WindowsEditor/
+
+# Compiled binaries and libraries
+*.dll
+*.pdb
+*.exe
+*.lib
+*.a
+*.so
+*.dylib
+
+# Object files
+*.o
+*.obj
+
+# Generated asset files that can be rebuilt
+*.uasset
+*.umap
+
+# Test output files
+Tests/Data/Output/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build configuration files that may contain personal settings
+BuildConfiguration.xml
+
+# Node / TypeScript tooling artifacts
+ue_yaml_tools/node_modules/
+ue_yaml_tools/.npm-cache/
+ue_yaml_tools/dist/
+ue_yaml_tools/*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

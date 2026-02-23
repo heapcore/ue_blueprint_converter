@@ -1,0 +1,166 @@
+# Example Blueprint YAML - Player Character
+version: 1
+blueprint:
+  name: BP_PlayerCharacter
+  parent: /Script/Engine.Character
+  description: "Main player character with health and inventory system"
+
+  # Blueprint Variables
+  variables:
+    - name: Health
+      type: float
+      default: 100.0
+      category: Stats
+      tooltip: "Current player health"
+      flags: [EditAnywhere, BlueprintReadWrite]
+
+    - name: MaxHealth
+      type: float
+      default: 100.0
+      category: Stats
+      tooltip: "Maximum player health"
+      flags: [EditAnywhere, BlueprintReadOnly]
+
+    - name: Inventory
+      type: array
+      subtype: object
+      object_class: /Game/Items/BP_Item
+      category: Inventory
+      flags: [BlueprintReadWrite]
+
+    - name: IsDead
+      type: bool
+      default: false
+      category: State
+      flags: [BlueprintReadOnly]
+
+  # Components
+  components:
+    - name: SpringArm
+      type: SpringArmComponent
+      parent: RootComponent
+      properties:
+        TargetArmLength: 400.0
+        bUsePawnControlRotation: true
+
+    - name: Camera
+      type: CameraComponent
+      parent: SpringArm
+      socket: SpringEndpoint
+
+  # Functions
+  functions:
+    - name: TakeDamage
+      category: Health
+      access: public
+      pure: false
+      inputs:
+        - name: DamageAmount
+          type: float
+          default: 10.0
+      outputs:
+        - name: ActualDamage
+          type: float
+        - name: IsDead
+          type: bool
+      nodes:
+        - id: entry
+          type: FunctionEntry
+          position: [0, 0]
+
+        - id: get_health
+          type: GetVariable
+          variable: Health
+          position: [200, 0]
+
+        - id: subtract
+          type: Subtract_FloatFloat
+          position: [400, 0]
+          pins:
+            A:
+              connection: {node: get_health, pin: Value}
+            B:
+              connection: {node: entry, pin: DamageAmount}
+
+        - id: clamp
+          type: Clamp_Float
+          position: [600, 0]
+          pins:
+            Value:
+              connection: {node: subtract, pin: ReturnValue}
+            Min:
+              value: 0.0
+            Max:
+              connection: {node: get_max_health, pin: Value}
+
+        - id: get_max_health
+          type: GetVariable
+          variable: MaxHealth
+          position: [400, 200]
+
+        - id: set_health
+          type: SetVariable
+          variable: Health
+          position: [800, 0]
+          pins:
+            Value:
+              connection: {node: clamp, pin: ReturnValue}
+          exec:
+            in: {node: entry, pin: exec}
+
+        - id: check_death
+          type: LessEqual_FloatFloat
+          position: [1000, 100]
+          pins:
+            A:
+              connection: {node: clamp, pin: ReturnValue}
+            B:
+              value: 0.0
+
+        - id: set_dead
+          type: SetVariable
+          variable: IsDead
+          position: [1200, 100]
+          pins:
+            Value:
+              connection: {node: check_death, pin: ReturnValue}
+          exec:
+            in: {node: set_health, pin: exec}
+
+        - id: return
+          type: FunctionReturn
+          position: [1400, 0]
+          pins:
+            ActualDamage:
+              connection: {node: subtract, pin: ReturnValue}
+            IsDead:
+              connection: {node: check_death, pin: ReturnValue}
+          exec:
+            in: {node: set_dead, pin: exec}
+
+  # Event Graph
+  event_graph:
+    nodes:
+      - id: begin_play
+        type: Event_BeginPlay
+        position: [0, 0]
+
+      - id: print_start
+        type: PrintString
+        position: [200, 0]
+        pins:
+          InString:
+            value: "Player spawned!"
+        exec:
+          in: {node: begin_play, pin: exec}
+
+      - id: input_jump
+        type: InputAction_Jump
+        position: [0, 300]
+
+      - id: character_jump
+        type: Jump
+        position: [200, 300]
+        target: self
+        exec:
+          in: {node: input_jump, pin: Pressed}

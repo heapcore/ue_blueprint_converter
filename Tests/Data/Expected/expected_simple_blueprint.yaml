@@ -1,0 +1,18 @@
+version: 1
+blueprints:
+  - name: BP_SimpleTest
+    type: "Normal"
+    variables:
+      - name: TestVariable
+        type: "float"
+        default: 42.0
+        editable: true
+      - name: PlayerName
+        type: "string"
+        default: "Player"
+        editable: true
+      - name: IsAlive
+        type: "bool"
+        default: true
+    event_graph:
+      - node: Event BeginPlay

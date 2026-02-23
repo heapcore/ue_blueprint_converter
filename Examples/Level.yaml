@@ -1,0 +1,46 @@
+version: 1
+project:
+  maps_dir: "/Game/Maps"
+  assets_dir: "/Game/Generated"
+
+level:
+  name: "L_Example"
+  world_partition: false
+
+actors:
+  - name: "SM_Table_01"
+    class: "StaticMeshActor"
+    transform: { location: [0,0,0], rotation: [0,0,0], scale: [1,1,1] }
+    props:
+      Tags: ["interior", "table"]
+      Mobility: "Static"
+
+  - name: "LightKey"
+    class: "PointLight"
+    transform: { location: [200,50,150], rotation: [0,0,0], scale: [1,1,1] }
+    props: { Intensity: 5000 }
+
+blueprints:
+  - name: "BP_Door"
+    type: "Actor"
+    components:
+      - type: "StaticMeshComponent"
+        name: "Mesh"
+        props: { StaticMesh: "/Game/Props/SM_Door" }
+    variables:
+      - name: "IsOpen"
+        type: "bool"
+        default: false
+        editable: true
+    construction_script:
+      - node: "PrintString"
+        inputs: { InString: "Constructing Door" }
+    event_graph:
+      - event: "BeginPlay"
+      - node: "PrintString"
+        inputs: { InString: "Hello from BP_Door" }
+        links: { ExecIn: "BeginPlay" }
+
+place:
+  - blueprint: "BP_Door"
+    at: { location: [100,0,0] }

@@ -1,0 +1,42 @@
+# Simple test level for UMAP import/export testing
+version: 1
+
+level:
+  name: "L_SimpleLevel"
+  description: "Simple test level with basic actors"
+  world_settings:
+    gravity: [0, 0, -980]
+
+actors:
+  - name: "Floor_01"
+    class: "StaticMeshActor"
+    transform:
+      location: [0, 0, 0]
+      rotation: [0, 0, 0]
+      scale: [10, 10, 1]
+    properties:
+      Tags: ["floor", "geometry"]
+      Mobility: "Static"
+    static_mesh: "/Engine/BasicShapes/Cube"
+
+  - name: "TestLight"
+    class: "DirectionalLight"
+    transform:
+      location: [500, 0, 1000]
+      rotation: [-45, 30, 0]
+      scale: [1, 1, 1]
+    properties:
+      Tags: ["lighting"]
+      Mobility: "Stationary"
+    light:
+      intensity: 3.14
+      color: [1.0, 0.95, 0.8]
+
+  - name: "PlayerSpawn"
+    class: "PlayerStart"
+    transform:
+      location: [0, 0, 200]
+      rotation: [0, 0, 0]
+      scale: [1, 1, 1]
+    properties:
+      Tags: ["spawn", "player"]

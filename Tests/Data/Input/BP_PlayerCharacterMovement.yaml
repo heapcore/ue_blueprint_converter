@@ -1,0 +1,255 @@
+# Player Character Blueprint with Complete Movement System
+version: 1
+blueprints:
+  - name: BP_PlayerCharacterMovement
+    type: "Normal"
+    parent: "/Script/Engine.Character"
+    description: "Player character with WASD movement, mouse look, crouch, jump, and sprint"
+
+    # Movement variables
+    variables:
+      - name: BaseWalkSpeed
+        type: "float"
+        default: 600.0
+        editable: true
+        category: "Movement"
+        tooltip: "Normal walking speed"
+
+      - name: BaseSprintSpeed
+        type: "float"
+        default: 1000.0
+        editable: true
+        category: "Movement"
+        tooltip: "Sprint speed when holding Shift"
+
+      - name: BaseTurnRate
+        type: "float"
+        default: 45.0
+        editable: true
+        category: "Movement"
+        tooltip: "Base turn rate in degrees per second"
+
+      - name: BaseLookUpRate
+        type: "float"
+        default: 45.0
+        editable: true
+        category: "Movement"
+        tooltip: "Base look up/down rate in degrees per second"
+
+      - name: IsSprinting
+        type: "bool"
+        default: false
+        editable: false
+        category: "Movement State"
+        tooltip: "Is player currently sprinting"
+
+      - name: MouseSensitivity
+        type: "float"
+        default: 1.0
+        editable: true
+        category: "Input"
+        tooltip: "Mouse sensitivity multiplier"
+
+    # Components
+    components:
+      - name: SpringArmComponent
+        type: "SpringArmComponent"
+        parent: "RootComponent"
+        properties:
+          TargetArmLength: 400.0
+          bUsePawnControlRotation: true
+          bInheritPitch: true
+          bInheritYaw: true
+          bInheritRoll: false
+
+      - name: CameraComponent
+        type: "CameraComponent"
+        parent: "SpringArmComponent"
+        socket: "SpringEndpoint"
+
+    # Event Graph with input handling
+    event_graph:
+      - node: "Event BeginPlay"
+        id: "begin_play"
+        position: [0, 0]
+        exec_out: ["setup_character"]
+
+      - node: "Setup Character"
+        id: "setup_character"
+        type: "Comment"
+        position: [200, 0]
+        comment: "Initialize character movement settings"
+        exec_in: "begin_play"
+
+      # WASD Movement Input Events
+      - node: "InputAxis MoveForward"
+        id: "input_move_forward"
+        position: [0, 200]
+        axis_value: "AxisValue"
+        exec_out: ["move_forward"]
+
+      - node: "Add Movement Input"
+        id: "move_forward"
+        position: [200, 200]
+        function: "AddMovementInput"
+        target: "self"
+        pins:
+          WorldDirection:
+            value: [1.0, 0.0, 0.0]  # Forward vector
+          ScaleValue:
+            from: "input_move_forward"
+            pin: "AxisValue"
+        exec_in: "input_move_forward"
+
+      - node: "InputAxis MoveRight"
+        id: "input_move_right"
+        position: [0, 300]
+        axis_value: "AxisValue"
+        exec_out: ["move_right"]
+
+      - node: "Add Movement Input"
+        id: "move_right"
+        position: [200, 300]
+        function: "AddMovementInput"
+        target: "self"
+        pins:
+          WorldDirection:
+            value: [0.0, 1.0, 0.0]  # Right vector
+          ScaleValue:
+            from: "input_move_right"
+            pin: "AxisValue"
+        exec_in: "input_move_right"
+
+      # Mouse Look Input
+      - node: "InputAxis Turn"
+        id: "input_turn"
+        position: [0, 400]
+        axis_value: "AxisValue"
+        exec_out: ["add_yaw_input"]
+
+      - node: "Add Controller Yaw Input"
+        id: "add_yaw_input"
+        position: [200, 400]
+        function: "AddControllerYawInput"
+        target: "self"
+        pins:
+          Val:
+            from: "input_turn"
+            pin: "AxisValue"
+        exec_in: "input_turn"
+
+      - node: "InputAxis LookUp"
+        id: "input_look_up"
+        position: [0, 500]
+        axis_value: "AxisValue"
+        exec_out: ["add_pitch_input"]
+
+      - node: "Add Controller Pitch Input"
+        id: "add_pitch_input"
+        position: [200, 500]
+        function: "AddControllerPitchInput"
+        target: "self"
+        pins:
+          Val:
+            from: "input_look_up"
+            pin: "AxisValue"
+        exec_in: "input_look_up"
+
+      # Jump Input (Space)
+      - node: "InputAction Jump"
+        id: "input_jump_pressed"
+        position: [0, 600]
+        exec_out: ["character_jump"]
+
+      - node: "Jump"
+        id: "character_jump"
+        position: [200, 600]
+        function: "Jump"
+        target: "self"
+        exec_in: "input_jump_pressed"
+
+      - node: "InputAction Jump Released"
+        id: "input_jump_released"
+        position: [0, 700]
+        exec_out: ["character_stop_jump"]
+
+      - node: "Stop Jumping"
+        id: "character_stop_jump"
+        position: [200, 700]
+        function: "StopJumping"
+        target: "self"
+        exec_in: "input_jump_released"
+
+      # Crouch Input (Left Ctrl)
+      - node: "InputAction Crouch"
+        id: "input_crouch_pressed"
+        position: [0, 800]
+        exec_out: ["character_crouch"]
+
+      - node: "Crouch"
+        id: "character_crouch"
+        position: [200, 800]
+        function: "Crouch"
+        target: "self"
+        exec_in: "input_crouch_pressed"
+
+      - node: "InputAction Crouch Released"
+        id: "input_crouch_released"
+        position: [0, 900]
+        exec_out: ["character_uncrouch"]
+
+      - node: "UnCrouch"
+        id: "character_uncrouch"
+        position: [200, 900]
+        function: "UnCrouch"
+        target: "self"
+        exec_in: "input_crouch_released"
+
+      # Sprint Input (Left Shift)
+      - node: "InputAction Sprint"
+        id: "input_sprint_pressed"
+        position: [0, 1000]
+        exec_out: ["start_sprint"]
+
+      - node: "Set IsSprinting"
+        id: "start_sprint"
+        position: [200, 1000]
+        variable: "IsSprinting"
+        value: true
+        exec_in: "input_sprint_pressed"
+        exec_out: ["set_sprint_speed"]
+
+      - node: "Set Max Walk Speed"
+        id: "set_sprint_speed"
+        position: [400, 1000]
+        function: "SetMaxWalkSpeed"
+        target: "CharacterMovement"
+        pins:
+          MaxWalkSpeed:
+            from: "variable"
+            name: "BaseSprintSpeed"
+        exec_in: "start_sprint"
+
+      - node: "InputAction Sprint Released"
+        id: "input_sprint_released"
+        position: [0, 1100]
+        exec_out: ["stop_sprint"]
+
+      - node: "Set IsSprinting"
+        id: "stop_sprint"
+        position: [200, 1100]
+        variable: "IsSprinting"
+        value: false
+        exec_in: "input_sprint_released"
+        exec_out: ["set_walk_speed"]
+
+      - node: "Set Max Walk Speed"
+        id: "set_walk_speed"
+        position: [400, 1100]
+        function: "SetMaxWalkSpeed"
+        target: "CharacterMovement"
+        pins:
+          MaxWalkSpeed:
+            from: "variable"
+            name: "BaseWalkSpeed"
+        exec_in: "stop_sprint"
